@@ -1,23 +1,26 @@
-# maple-io-server
+# Maple.io Server (server_ms)
 
-v95 MapleStory server emulator written in TypeScript using a microservice architecture.
+A v95 MapleStory server emulator written in TypeScript using a microservice architecture, with a bundled Electron admin panel.
+
+[![License](https://img.shields.io/github/license/archlo/server_ms)](LICENSE)
+[![GitHub repo](https://img.shields.io/badge/repo-archlo/server_ms-blue)](https://github.com/archlo/server_ms)
 
 ## Architecture
 
-Four server processes communicate over TCP:
+A master process (`index.ts`) forks four server workers that communicate over TCP:
 
-- **CenterServer** — central coordinator: manages login/shop/channel server registrations, account auth, character CRUD, world/channel listing
-- **LoginServer** — client handshake, encryption setup, delegates auth to CenterServer
-- **ChannelServer** — gameplay: fields, mobs, NPCs, items, skills, quests, parties, minirooms, guilds, events
-- **ShopServer** — cash shop: item purchases, gift sending, wishlist
+- **CenterServer** (port `8483`) — central coordinator: server registrations, account auth, character CRUD, world/channel listing
+- **LoginServer** (port `8484`) — client handshake, encryption setup, delegates auth to CenterServer
+- **ShopServer** (port `8485`) — cash shop: item purchases, gift sending, wishlist
+- **ChannelServer** (port `8486`) — gameplay: fields, mobs, NPCs, items, skills, quests, parties, minirooms, guilds, events
 
-A master process (`index.ts`) forks all four workers and exposes Prometheus metrics on port 3001.
+The master process also exposes Prometheus metrics on port `3001` and an admin API server on port `3002`.
 
 ## Features
 
 ### Network & Protocol
 - MapleStory AES + Shanda encryption
-- Full packet reader/writer with all MapleStory types (bytes, shorts, ints, longs, FILETIME, positions, Maple-ASCII strings, fixed strings, null-terminated strings)
+- Full packet reader/writer for all MapleStory types (bytes, shorts, ints, longs, FILETIME, positions, Maple-ASCII strings, fixed strings, null-terminated strings)
 - Session-based connection management with ACK-wait, timeout, and reconnection handling
 
 ### Data Loading
@@ -28,7 +31,7 @@ A master process (`index.ts`) forks all four workers and exposes Prometheus metr
 ### Character System
 - Full stat model: base stats, equips, buffs, forced stats, passive skills, temporary stats
 - Job system: all classes (Warrior, Magician, Archer, Thief, Pirate, Cygnus, Aran, Evan, Resistance, DualBlade, GM) with job-advancement handling
-- Skill system: skill records, SP management, skill processors with job-specific handlers
+- Skill system: skill records, SP management, job-specific skill processors
 - Equipment: scroll enhancement, potential/option stats, sockets, upgrades, gold hammer, repair, skill resets
 - Inventory: equip/use/setup/etc/special/cash inventories with full move/swap/add/remove operations
 - Pet system: pet items, interaction, tameness, skills
@@ -77,26 +80,96 @@ A master process (`index.ts`) forks all four workers and exposes Prometheus metr
 - Elevator (Ludibrium), Subway (Kerning City)
 
 ### Party Quests
-- **Henesys PQ (Moon Bunny)**: full implementation — Tory entrance dialog, Primrose Hill instance with mob/reactor spawning, Moon Bunny protection, Growlie rice-cake submission with clear/fail logic, Tommy bonus stage
-- **Kerning PQ (First Time Together)**: full implementation — Lakelis entrance with party gating, Cloto's 5 stages (coupon collection, rope puzzle, platform puzzle, Curse Eyes elimination, King Slime boss), Nella exit, stage-entry weather hints and gate object-state effects
-- **Ludi Dimensional Crack PQ** (Lv. 120+): 5 stages — collect 20 Dimensional Passes, clear dimensional cracks, box maze portal puzzle, platform math puzzle, boss clear
-- **Escape! PQ (Prison Break)** (Lv. 50+): 7 stages — stealth tower, guard elimination, maze, prison key recovery, Prison Guard boss
-- **Lord Pirate PQ (Davy John)** (Lv. 60+): 5 stages — chest mob spawns, Pirate Mark collection (Rookie/Rising/Veteran), door-key mechanics, Captain Davy John boss
+- **Henesys PQ (Moon Bunny)** — Tory entrance dialog, Primrose Hill instance, Moon Bunny protection, Growlie rice-cake submission, Tommy bonus stage
+- **Kerning PQ (First Time Together)** — Lakelis entrance, Cloto's 5 stages, Nella exit, stage-entry weather hints
+- **Ludi Dimensional Crack PQ** (Lv. 120+) — 5 stages with passes, cracks, portal puzzle, platform math puzzle, boss
+- **Escape! PQ (Prison Break)** (Lv. 50+) — 7 stages with stealth tower, guard elimination, maze, key recovery, boss
+- **Lord Pirate PQ (Davy John)** (Lv. 60+) — 5 stages with chest spawns, Pirate Marks, door keys, boss
+
+### Admin Panel
+- Electron-based desktop admin panel (`admin/`) — command prompt, player management, notices, accounts
+- Admin API server (port `3002`) + Channel admin proxy
+- Admin commands (console-based)
 
 ### Other
-- Admin commands (console-based)
 - Character ranking
 - MapleTV message system with queue management
-- Broadcast messages (notices, popups, megaphones, item announcements, etc.)
+- Broadcast messages (notices, popups, megaphones, item announcements)
 - IChat/social packet handling
+
+## Requirements
+
+- **Node.js** 14+ (TypeScript 4.1, ts-node 9)
+- **MySQL** database (see [SQL setup](#database-setup))
+- **v95 MapleStory WZ/NX data** (see [WZ data](#wz-data) below)
+- Windows or Linux
+
+## Database Setup
+
+The SQL files in `sql/` must be executed **in order**:
+
+1. `sql/db_database.sql` — schema, tables, base data
+2. `sql/db_drops.sql` — drop data
+3. `sql/db_shopupdate.sql` — optional; requires the provided WZ files
+
+## WZ Data
+
+The server reads MapleStory data from **NX (PKG4) files** — it does **not** ship with them, and they are intentionally excluded from this repository.
+
+Place the required `.nx` files in the `wz/` directory:
+
+| File | Contents |
+|------|----------|
+| `Base.nx` | Global constants |
+| `Character.nx` | Character, avatar, jobs |
+| `Effect.nx` | Skill/field effects |
+| `Etc.nx` | Miscellaneous data |
+| `Item.nx` | All items, equips, consumables |
+| `Map.nx` | Maps, maps, portals, physics |
+| `Mob.nx` | Mobs, drop/reward linkage |
+| `Morph.nx` | Morph/animation data |
+| `Npc.nx` | NPCs |
+| `Quest.nx` | Quest data |
+| `Reactor.nx` | Reactors |
+| `Skill.nx` | Skills |
+| `Sound.nx` | Sound effects |
+| `String.nx` | In-game strings |
+| `TamingMob.nx` | Tamed mobs (mounts) |
+| `UI.nx` | UI resources |
+
+The NX directory defaults to `server/wz/` but can be overridden with the `NX_DIR` environment variable:
+
+```bash
+# Windows
+set NX_DIR=C:\maple\nx
+# Linux / macOS
+export NX_DIR=/path/to/nx
+```
+
+> WZ files referenced in code as `Character.wz/...` are resolved to `Character.nx` automatically.
 
 ## Setup
 
 ```bash
 npm install
-cp .env.example .env   # configure database and server settings
+
+# copy and configure environment
+cp .env.example .env
+
+# build TypeScript
 npm run build
+
+# start the server
 npm run start
+```
+
+Configure the database in `.env`:
+
+```env
+DB_HOST="127.0.0.1"
+DB_USER="root"
+DB_PASSWORD="root"
+DB_SCHEMA="omega"
 ```
 
 ## Running
@@ -105,7 +178,47 @@ npm run start
 |---------|-------------|
 | `npm run start` | Build + run with 4GB heap |
 | `npm run build` | Clean + compile TypeScript |
-| `npm run test`  | Run unit tests (Mocha + Chai) |
+| `npm run test` | Run unit tests (Mocha + Chai) |
+| `start.bat` | Windows launcher: installs deps, creates `.env`, launches the Electron admin panel |
+
+### Admin Panel
+
+`start.bat` launches the Electron admin panel (`admin/`). Inside it, use the **Server** tab to start / restart / shutdown the maple server processes.
+
+The admin API server listens on port `3002`. The default API token is set in `config/admin.hjson` — **change it before exposing the server publicly**.
+
+## Configuration
+
+JSON/HJSON config files in `config/`:
+
+| File | Purpose |
+|------|---------|
+| `admin.hjson` | Admin API host/port/token |
+| `center.hjson` | CenterServer port |
+| `login.hjson` | LoginServer port, auto-register |
+| `shop.hjson` | ShopServer port |
+| `channel.hjson` | ChannelServer port |
+| `game.hjson` | Gameplay toggles (enforceAdminAccount, enablePin, enablePic) |
+
+## Project Structure
+
+```
+server_ms/
+├── admin/          # Electron admin panel
+├── config/         # Server configuration (HJSON)
+├── data/           # Reward / shop YAML data
+├── sql/            # MySQL schema + seed scripts
+├── src/            # TypeScript source
+│   ├── server/     # center / login / shop / channel workers
+│   ├── world/      # gameplay: field, item, mob, quest, skill, script...
+│   ├── wz-utils/   # NX (PKG4) reader
+│   ├── protocol/   # packets & encryption
+│   └── provider/   # WZ data providers
+├── test/           # Mocha unit tests
+├── wz/             # NX data (not committed)
+├── index.ts        # Master entry point
+└── package.json
+```
 
 ## Conventions
 
@@ -113,3 +226,7 @@ npm run start
 - Files, functions, variables: camelCase
 - SQL tables/columns: snake_case
 - Tests: `*.test.ts` in `test/`
+
+## License
+
+ISC — see the package manifest.
