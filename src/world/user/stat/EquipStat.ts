@@ -1,0 +1,17 @@
+export const enum EquipStat {
+  PAD = 0,
+  MAD = 1,
+  STR = 2,
+  DEX = 3,
+  INT = 4,
+  LUK = 5,
+  MAX_HP = 6,
+  MAX_MP = 7,
+  PDD = 8,
+  MDD = 9,
+  ACC = 10,
+  EVA = 11,
+  CRAFT = 12,
+  SPEED = 13,
+  JUMP = 14,
+}

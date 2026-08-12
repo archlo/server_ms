@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src http: ws:">
+  <title>Maple Admin Panel</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="toasts"></div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="logo">M</span>
+      <div>
+        <h1>Maple Admin</h1>
+        <span id="connBadge" class="badge offline">offline</span>
+      </div>
+    </div>
+
+    <nav>
+      <button class="nav-item active" data-view="server">Server</button>
+      <button class="nav-item" data-view="players">Players</button>
+      <button class="nav-item" data-view="rates">Rates</button>
+      <button class="nav-item" data-view="network">Network</button>
+      <button class="nav-item" data-view="notices">Notices</button>
+      <button class="nav-item" data-view="accounts">Accounts</button>
+    </nav>
+
+    <div class="conn-form">
+      <input id="apiUrl" type="text" value="http://127.0.0.1:3002" placeholder="API URL" spellcheck="false">
+      <input id="token" type="password" placeholder="admin token" spellcheck="false">
+      <button id="connectBtn" class="full">Connect</button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <!-- ======================= SERVER VIEW ======================= -->
+    <section id="view-server" class="view active">
+      <div class="view-header">
+        <h2>Server</h2>
+        <div class="server-buttons">
+          <button id="serverStartBtn" class="primary">Start</button>
+          <button id="serverRestartBtn">Restart</button>
+          <button id="serverStopBtn" class="danger">Shutdown</button>
+          <span id="serverState" class="badge offline">stopped</span>
+        </div>
+      </div>
+      <div id="serverOutput" class="console">Server console will appear here. Click Start to boot the maple server.\n</div>
+    </section>
+
+    <!-- ======================= PLAYERS VIEW ======================= -->
+    <section id="view-players" class="view">
+      <div class="view-header">
+        <h2>Online Players</h2>
+        <span id="playerCount" class="badge">0 online</span>
+      </div>
+
+      <div class="quick-actions">
+        <h3>Quick Actions</h3>
+        <div class="qa-row">
+          <select id="qaPlayer">
+            <option value="">— select player —</option>
+          </select>
+          <span class="qa-group">
+            <button id="qaMesoBtn" class="primary">Give Meso</button>
+            <input id="qaMesoAmt" type="number" min="0" placeholder="meso" value="1000000">
+          </span>
+          <span class="qa-group">
+            <button id="qaNxBtn">Give NX</button>
+            <input id="qaNxAmt" type="number" min="0" placeholder="nx" value="5000">
+          </span>
+          <span class="qa-group">
+            <button id="qaItemBtn">Give Item</button>
+            <input id="qaItemId" type="number" placeholder="item id">
+            <input id="qaItemCnt" type="number" min="1" value="1" placeholder="count">
+          </span>
+          <span class="qa-group">
+            <button id="qaLevelBtn">Set Level</button>
+            <input id="qaLevel" type="number" min="1" max="200" value="200" placeholder="level">
+          </span>
+          <span class="qa-group">
+            <button id="qaJobBtn">Set Job</button>
+            <input id="qaJob" type="number" placeholder="job id">
+          </span>
+          <span class="qa-group">
+            <button id="qaWarpBtn">Warp</button>
+            <input id="qaWarpMap" type="number" placeholder="map id">
+          </span>
+          <button id="qaKickBtn" class="danger">Kick</button>
+          <button id="qaBanBtn" class="danger">Ban</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="playerTable">
+          <thead>
+            <tr><th>Name</th><th>Lv</th><th>Job</th><th>Map</th><th>IP</th><th>Meso</th><th>NX</th><th>GM</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ======================= RATES VIEW ======================= -->
+    <section id="view-rates" class="view">
+      <div class="view-header"><h2>Game Rates</h2></div>
+      <div class="cards">
+        <div class="card">
+          <h3>EXP Rate</h3>
+          <p class="card-hint">Multiplies all EXP gained (kills, quests, etc). Applies immediately.</p>
+          <input id="expRate" type="number" min="0.01" step="0.5" value="1">
+          <button id="expRateBtn" class="primary">Set EXP Rate</button>
+        </div>
+        <div class="card">
+          <h3>Drop Rate</h3>
+          <p class="card-hint">Multiplies the chance of items dropping from monsters. Applies immediately.</p>
+          <input id="dropRate" type="number" min="0.01" step="0.5" value="1">
+          <button id="dropRateBtn" class="primary">Set Drop Rate</button>
+        </div>
+        <div class="card">
+          <h3>Meso Rate</h3>
+          <p class="card-hint">Multiplies the amount of mesos dropped by monsters. Applies immediately.</p>
+          <input id="mesoRate" type="number" min="0.01" step="0.5" value="1">
+          <button id="mesoRateBtn" class="primary">Set Meso Rate</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>All Rates</h3>
+        <div class="row">
+          <input id="allRates" type="number" min="0.01" step="0.5" placeholder="apply the same multiplier to all rates">
+          <button id="allRatesBtn" class="primary">Set All</button>
+        </div>
+        <p class="card-hint small">Current rates are loaded from the server when you connect.</p>
+      </div>
+    </section>
+
+    <!-- ======================= NETWORK VIEW ======================= -->
+    <section id="view-network" class="view">
+      <div class="view-header"><h2>Network (IP / Ports)</h2></div>
+      <div class="card">
+        <p class="card-hint">These are read from config/*.hjson. Changes are saved to disk — restart the server (Restart button) to apply them.</p>
+        <div class="net-grid">
+          <label>Center host<input id="netCenterHost"></label>
+          <label>Center port<input id="netCenterPort" type="number"></label>
+          <label>Login host<input id="netLoginHost"></label>
+          <label>Login port<input id="netLoginPort" type="number"></label>
+          <label>Channel host<input id="netChannelHost"></label>
+          <label>Channel port<input id="netChannelPort" type="number"></label>
+          <label>Shop host<input id="netShopHost"></label>
+          <label>Shop port<input id="netShopPort" type="number"></label>
+          <label>Admin host<input id="netAdminHost"></label>
+          <label>Admin port<input id="netAdminPort" type="number"></label>
+          <label>Admin token<input id="netAdminToken" type="text" spellcheck="false" placeholder="admin token"></label>
+        </div>
+        <div class="row">
+          <button id="netSaveBtn" class="primary">Save Network Config</button>
+          <button id="netReloadBtn">Reload</button>
+        </div>
+        <p class="card-hint small">Changing the token or ports requires a server restart (Restart button on the Server tab) to take effect.</p>
+      </div>
+    </section>
+
+    <!-- ======================= NOTICES VIEW ======================= -->
+    <section id="view-notices" class="view">
+      <div class="view-header"><h2>Notices</h2></div>
+      <div class="card">
+        <label for="noticeText">Message</label>
+        <textarea id="noticeText" rows="4" placeholder="Type a message to broadcast to all online players"></textarea>
+        <div class="row">
+          <button id="noticeBtn" class="primary">Broadcast Notice</button>
+          <button id="popupBtn">Send Popup</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= ACCOUNTS VIEW ======================= -->
+    <section id="view-accounts" class="view">
+      <div class="view-header"><h2>Accounts</h2></div>
+      <div class="cards">
+        <div class="card">
+          <h3>Create account</h3>
+          <input id="accName" placeholder="username" spellcheck="false">
+          <input id="accPass" type="password" placeholder="password">
+          <button id="createAccBtn" class="primary">Create</button>
+        </div>
+
+        <div class="card">
+          <h3>GM flag</h3>
+          <input id="gmName" placeholder="username" spellcheck="false">
+          <label class="switch"><input id="gmOn" type="checkbox" checked> GM account</label>
+          <button id="setGmBtn" class="primary">Set</button>
+        </div>
+
+        <div class="card">
+          <h3>Ban / unban</h3>
+          <input id="banName" placeholder="username" spellcheck="false">
+          <input id="banReason" placeholder="reason (optional)" spellcheck="false">
+          <div class="row">
+            <button id="banBtn" class="danger">Ban</button>
+            <button id="unbanBtn">Unban</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

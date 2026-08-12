@@ -1,0 +1,34 @@
+import { Job } from '../Job';
+import { Char } from '../../../user/Char';
+
+const SKILL = {
+  PIRATES_REVENGE: 15120000,
+  MAPLE_WARRIOR: 15121000,
+  DRAGON_STRIKE: 15121001,
+  ENERGY_ORB: 15121002,
+  SUPER_TRANSFORMATION: 15121003,
+  DEMOLITION: 15121004,
+  SNATCH: 15121005,
+  BARRAGE: 15121006,
+  PIRATES_RAGE: 15121007,
+  SPEED_INFUSION: 15121008,
+  TIME_LEAP: 15121009,
+};
+
+export class Buccaneer implements Job {
+  isHandlerOfSkill(skillId: number): boolean {
+    return [
+      SKILL.PIRATES_REVENGE,
+      SKILL.MAPLE_WARRIOR,
+      SKILL.DRAGON_STRIKE,
+      SKILL.ENERGY_ORB,
+      SKILL.SUPER_TRANSFORMATION,
+      SKILL.DEMOLITION,
+      SKILL.SNATCH,
+      SKILL.BARRAGE,
+      SKILL.PIRATES_RAGE,
+      SKILL.SPEED_INFUSION,
+      SKILL.TIME_LEAP,
+    ].includes(skillId);
+  }
+}

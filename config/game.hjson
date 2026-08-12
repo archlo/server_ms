@@ -1,0 +1,5 @@
+{
+    enforceAdminAccount: true,
+    enablePin: false,
+    enablePic: false
+}

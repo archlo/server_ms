@@ -1,0 +1,32 @@
+import { Job } from '../Job';
+import { Char } from '../../../user/Char';
+
+const SKILL = {
+  SHADOW_SHIFTER: 14120000,
+  VENOMOUS_STAR: 14120001,
+  EXPERT_THROWING_STAR_HANDLING: 14120002,
+  MAPLE_WARRIOR: 14121000,
+  TAUNT: 14121002,
+  NINJA_AMBUSH: 14121003,
+  SHADOW_STARS: 14121004,
+  TRIPLE_THROW: 14121005,
+  NINJA_STORM: 14121006,
+  HEROS_WILL: 14121008,
+};
+
+export class NightLord implements Job {
+  isHandlerOfSkill(skillId: number): boolean {
+    return [
+      SKILL.SHADOW_SHIFTER,
+      SKILL.VENOMOUS_STAR,
+      SKILL.EXPERT_THROWING_STAR_HANDLING,
+      SKILL.MAPLE_WARRIOR,
+      SKILL.TAUNT,
+      SKILL.NINJA_AMBUSH,
+      SKILL.SHADOW_STARS,
+      SKILL.TRIPLE_THROW,
+      SKILL.NINJA_STORM,
+      SKILL.HEROS_WILL,
+    ].includes(skillId);
+  }
+}

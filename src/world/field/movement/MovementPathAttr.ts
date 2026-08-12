@@ -1,0 +1,37 @@
+export class MovementPathAttr {
+  static readonly NORMAL: number = 0;
+  static readonly JUMP: number = 1;
+  static readonly IMMEDIATE: number = 2;
+  static readonly TELEPORT: number = 3;
+  static readonly IMPACT: number = 4;
+  static readonly FLASH_JUMP: number = 5;
+  static readonly ASSAULTER: number = 6;
+  static readonly ASSASSINATION: number = 7;
+  static readonly STAT_CHANGE: number = 8;
+  static readonly RUSH: number = 9;
+  static readonly SIT_DOWN: number = 10;
+  static readonly START_FALL_DOWN: number = 11;
+  static readonly FLYING_BLOCK: number = 12;
+  static readonly HANG_ON_BACK: number = 13;
+  static readonly FALL_DOWN: number = 14;
+  static readonly WINGS: number = 15;
+  static readonly MOB_ATK_RUSH: number = 16;
+  static readonly MOB_ATK_RUSH_STOP: number = 17;
+  static readonly START_WINGS: number = 18;
+  static readonly MOB_TOSS: number = 19;
+  static readonly DASH_SLIDE: number = 20;
+  static readonly MOB_LADDER: number = 21;
+  static readonly MOB_RIGHT_ANGLE: number = 22;
+  static readonly MOB_STOP_NODE_START: number = 23;
+  static readonly MOB_BEFORE_NODE: number = 24;
+  static readonly ROCKET_BOOSTER: number = 25;
+  static readonly BACK_STEP_SHOT: number = 26;
+  static readonly MOB_POWER_KNOCK_BACK: number = 27;
+  static readonly VERTICAL_JUMP: number = 28;
+  static readonly CUSTOM_IMPACT: number = 29;
+  static readonly COMBAT_STEP: number = 30;
+  static readonly HIT: number = 31;
+  static readonly TIME_BOMB_ATK: number = 32;
+  static readonly SNOW_BALL_TOUCH: number = 33;
+  static readonly BUFF_ZONE_EFFECT: number = 34;
+}

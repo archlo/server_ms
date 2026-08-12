@@ -1,0 +1,15 @@
+export enum QuestResultType {
+  Start_QuestTimer = 6,
+  End_QuestTimer = 7,
+  Start_TimeKeepQuestTimer = 8,
+  End_TimeKeepQuestTimer = 9,
+  Success = 10,
+  Failed_Unknown = 11,
+  Failed_Inventory = 12,
+  Failed_Meso = 13,
+  Failed_Pet = 14,
+  Failed_Equipped = 15,
+  Failed_OnlyItem = 16,
+  Failed_TimeOver = 17,
+  Reset_QuestTimer = 18,
+}

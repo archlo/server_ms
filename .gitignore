@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment
+.env
+*.env.local
+
+# Logs
+logs/*.log
+
+# WZ / NX game data (binary, large)
+wz/
+*.nx
+
+# IDE / editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Java (legacy)
+java/
+
+# AI tooling & generated data
+.claude/
+.mimocode/
+.cursor/
+.ai/
+.aide/
+.gemini/
+.chatgpt/
+copilot-instructions.md
+*.ai-chat
+*.ai-notes
+ai-context/
+ai-output/
+prompts/

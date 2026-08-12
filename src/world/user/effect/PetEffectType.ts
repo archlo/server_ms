@@ -1,0 +1,16 @@
+export const enum PetEffectType {
+  WINK = 0,
+  SLEEP = 1,
+  LOVE = 2,
+  BALLOON = 3,
+  FEEL = 4,
+  DROP = 5,
+  SKILL = 6,
+  DIE = 7,
+  PET_CODE = 8,
+  RING = 9,
+  WILD = 10,
+  LEVEL_UP = 11,
+  MONSTER = 12,
+  LETTER = 13,
+}
