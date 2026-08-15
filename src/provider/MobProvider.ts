@@ -6,17 +6,24 @@ import { MobTemplate } from './mob/MobTemplate';
 
 const mobTemplates    = new Map<number, MobTemplate>();
 const questCountGroups = new Map<number, Set<number>>();
+const resolvedMobIds   = new Map<number, number>();
 
 export const MobProvider = {
   initialize(): void {
     mobTemplates.clear();
     questCountGroups.clear();
+    resolvedMobIds.clear();
     loadMobTemplates();
     loadQuestCountGroups();
   },
 
   getMobTemplate(mobId: number): MobTemplate | undefined {
     return mobTemplates.get(mobId);
+  },
+
+  /** The mob id whose img actually carries this mob's data (resolves info/link chains). */
+  getResolvedTemplateId(mobId: number): number {
+    return resolvedMobIds.get(mobId) ?? mobId;
   },
 
   getQuestCountGroup(mobId: number): Set<number> {
@@ -42,6 +49,7 @@ function loadMobTemplates(): void {
     }
     mobProps.set(mobId, imgNode);
     mobTemplates.set(mobId, MobTemplate.from(mobId, imgNode, infoProp));
+    resolvedMobIds.set(mobId, mobId);
   }
 
   // resolve linked mobs (kinoko supports recursive links)
@@ -54,6 +62,7 @@ function loadMobTemplates(): void {
     }
     const linkProp = mobProps.get(link)!;
     mobTemplates.set(mobId, MobTemplate.from(mobId, linkProp, infoProp));
+    resolvedMobIds.set(mobId, link);
   }
 
   // validate revives

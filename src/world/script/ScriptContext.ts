@@ -284,7 +284,9 @@ export class ScriptContext {
       [Stat.JOB, cs.job],
     ]);
     this.user.write(statChangedMapPacket(statMap));
-    this.field.broadcastPacket(UserRemote.effect(this.user, Effect.jobChanged()), this.user);
+    // OG: the job-change animation (CUser::OnEffect case 0xA) plays for every
+    // field member, including the advancing player — broadcast to all.
+    this.field.broadcastPacket(UserRemote.effect(this.user, Effect.jobChanged()));
   }
 
   private getJobAdvanceHpBonus(jobId: number): number {

@@ -420,6 +420,8 @@ function handleAttack(user: User, attack: Attack): void {
     if (actualDamage > 0) {
       mob.addDamage(user.getCharacterId(), actualDamage);
       mob.setHp(mob.getHp() - actualDamage);
+      // TEMP DEBUG: 1-hit kill investigation
+      console.log(`[MeleeDbg] tmpl=${mob.getTemplateId()} maxHp=${mob.getMaxHp()} hpBefore=${mob.getHp() + actualDamage} dmgSent=${totalDamage} hpAfter=${mob.getHp()}`);
       field?.broadcastPacket(MobPacket.mobDamaged(mob, totalDamage));
     }
 

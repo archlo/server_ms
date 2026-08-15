@@ -274,7 +274,7 @@ distributeExp(): void {
     }
 
     const drops: Drop[] = [];
-    for (const reward of RewardProvider.getMobRewards(this.getTemplateId())) {
+    for (const reward of RewardProvider.getMobRewards(MobProvider.getResolvedTemplateId(this.getTemplateId()))) {
       const drop = this.createDrop(owner, reward);
       if (drop) drops.push(drop);
     }
@@ -373,7 +373,7 @@ distributeExp(): void {
   /** Port of kinoko's Mob::steal - picks a random reward and drops it (once per mob). */
   steal(attacker: User): void {
     if (this.stolenReward) return;
-    const rewards = RewardProvider.getMobRewards(this.getTemplateId());
+    const rewards = RewardProvider.getMobRewards(MobProvider.getResolvedTemplateId(this.getTemplateId()));
     const reward = Util.getRandomFromCollection(rewards, (r) => r.prob);
     if (!reward) return;
     const drop = this.createDrop(attacker, reward);

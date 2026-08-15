@@ -52,6 +52,14 @@ export class MigrationHandler {
         MigrationHandler.handleRevive(user, currentField, false);
         return;
       }
+      // Revive / return-to-nearest-town: CUIRevive::Revive sends field 0 +
+      // empty portal. Mob/fall/field deaths are simulated client-side, so the
+      // server HP may still be > 0 here — resolve the nearest town instead of
+      // warping to map 0 (the goAdventure tutorial map).
+      if (targetFieldId === 0) {
+        MigrationHandler.handleTransferField(user, MigrationHandler.nearestTown(currentField), GameConstants.DEFAULT_PORTAL_NAME, true);
+        return;
+      }
       // Transfer field by client request : ReservedEffect, CField::OBSTACLE, /m <map ID>
       MigrationHandler.handleTransferField(user, targetFieldId, GameConstants.DEFAULT_PORTAL_NAME, false);
       return;
@@ -92,9 +100,18 @@ export class MigrationHandler {
       user.setMp(user.getMaxMp());
       MigrationHandler.handleTransferField(user, field.getFieldId(), GameConstants.DEFAULT_PORTAL_NAME, true);
     } else {
-      const returnMap = field.getReturnMap();
+      const returnMap = MigrationHandler.nearestTown(field);
       user.setHp(50);
       MigrationHandler.handleTransferField(user, returnMap, GameConstants.DEFAULT_PORTAL_NAME, true);
     }
+  }
+
+  /** The field's nearest town = the map's returnMap. When the map data has no
+   *  returnMap (defaults to UNDEFINED_FIELD_ID) it falls back to the field
+   *  itself so a revive never warps to a nonexistent field (which would
+   *  dispose the user). */
+  private static nearestTown(field: Field): number {
+    const returnMap = field.getReturnMap();
+    return returnMap === GameConstants.UNDEFINED_FIELD_ID ? field.getFieldId() : returnMap;
   }
 }
