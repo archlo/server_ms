@@ -90,8 +90,10 @@ export class CreateCharacterHandler implements PacketHandler {
           sm.addSkill(sr);
         }
 
-        // Give starter equipment — create Equip objects directly with just the
-        // itemId (client loads sprites from Character.wz, doesn't need server stats).
+        // Give starter equipment — use ItemProvider so the Equip carries real
+        // template stats (incPAD etc.) from Character.wz; an empty Equip would
+        // serialize zero stats and make the client's runtime attrs override the
+        // weapon's WZ attack power (fresh characters would deal 1 damage).
         const im = cd.inventoryManager;
         const starterItems: Array<{ itemId: number; pos: number }> = [];
         if (topId > 0) starterItems.push({ itemId: topId, pos: -5 });
@@ -100,10 +102,9 @@ export class CreateCharacterHandler implements PacketHandler {
         if (weaponId > 0) starterItems.push({ itemId: weaponId, pos: -11 });
 
         for (const { itemId, pos } of starterItems) {
-            const eq = new (await import('../../../world/item/Equip')).Equip();
-            eq.itemSn = cd.getNextItemSn();
-            eq.itemId = itemId;
-            eq.quantity = 1;
+            const itemInfo = ItemProvider.getItemInfo(itemId);
+            if (!itemInfo) continue;
+            const eq = itemInfo.createItem(cd.getNextItemSn());
             im.equipped.putItem(pos, eq);
         }
 
