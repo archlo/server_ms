@@ -78,11 +78,13 @@ export class UserPacket {
       w.writeMapleAsciiString(adBoard);
     }
 
-    // CoupleRecord
+    // CoupleRecord — OG reads long(8) + long(8) + int(4) = 20 bytes
     const coupleRecord = user.getCoupleRecord();
     w.writeBoolean(coupleRecord.coupleId !== 0);
     if (coupleRecord.coupleId !== 0) {
-      coupleRecord.encodeForLocal(w, false);
+      w.writeLong(BigInt(coupleRecord.coupleId)); // coupleItemSN
+      w.writeLong(0n);                            // pairItemSN (unused in v95)
+      w.writeInt(0);                              // partnerCharId
     }
 
     // FriendshipRecord (byte flag + conditional: liFriendshipItemSN[8] + liFriendshipPairItemSN[8] + record[4])
@@ -94,12 +96,13 @@ export class UserPacket {
     // DarkForceEffect / DragonFury / Swallow_Mob effect flag (none active)
     w.writeByte(0);
 
-    // NewYearCard
+    // NewYearCard — OG reads Decode1(has) + Decode4(count) + count×Decode4(cardId)
     const newYearCards = user.getNewYearCards();
     w.writeBoolean(newYearCards.length > 0);
     if (newYearCards.length > 0) {
+      w.writeInt(newYearCards.length);
       for (const card of newYearCards) {
-        card.encode(w);
+        w.writeInt(card.cardId);
       }
     }
     w.writeInt(0); // nPhase
