@@ -85,6 +85,12 @@ export class UserPacket {
       coupleRecord.encodeForLocal(w, false);
     }
 
+    // FriendshipRecord (byte flag + conditional: liFriendshipItemSN[8] + liFriendshipPairItemSN[8] + record[4])
+    w.writeBoolean(false);
+
+    // MarriageRecord (byte flag + conditional: dwMarriageCharacterID[4] + dwMarriagePairCharacterID[4] + nWeddingRingID[4])
+    w.writeBoolean(false);
+
     // DarkForceEffect / DragonFury / Swallow_Mob effect flag (none active)
     w.writeByte(0);
 

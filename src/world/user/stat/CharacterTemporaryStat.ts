@@ -139,7 +139,7 @@ export enum CharacterTemporaryStat {
   Swallow_Template = 1005,
 }
 
-export const FLAG_SIZE = 17; // 17 * 32 = 544 bits (enough for 130 entries)
+export const FLAG_SIZE = 128; // 128 bits = 16 bytes (UINT128), matches OG DecodeForRemote / DecodeForLocal
 
 /** Encode order for local (self) temporaryStat — port of henesys.skills.CharacterTemporaryStat.ORDER */
 export const LOCAL_ENCODE_ORDER: CharacterTemporaryStat[] = [
