@@ -94,6 +94,17 @@ export class ScriptManager {
     return true;
   }
 
+  /** Field enter scripts (onUserEnter / onFirstUserEnter) — non-blocking, log on miss. */
+  static startFieldEnterScript(user: User, field: Field, scriptName: string): void {
+    const script = ScriptRegistry.fieldEnter.get(scriptName);
+    if (!script) {
+      console.warn(`[Script] Field enter script not found: ${scriptName} on field ${field.getFieldId()}`);
+      return;
+    }
+    if (user.hasDialog()) return;
+    new ScriptManager(user, field, script, 0).start();
+  }
+
   private advance(result: IteratorResult<ScriptMessage, void>): void {
     if (result.done) {
       this.terminate();

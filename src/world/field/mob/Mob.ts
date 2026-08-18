@@ -261,7 +261,7 @@ distributeExp(): void {
    */
   dropRewards(lastAttacker: User, delay: number): void {
     const field = this.getField();
-    if (!field) return;
+    if (!field) { console.log(`[DropDbg] dropRewards: no field for mob ${this.getTemplateId()}`); return; }
 
     let owner = lastAttacker;
     const sortedDamage = [...this.damageDone.entries()].sort((a, b) => b[1] - a[1]);
@@ -273,11 +273,15 @@ distributeExp(): void {
       }
     }
 
+    const resolvedId = MobProvider.getResolvedTemplateId(this.getTemplateId());
+    const rewards = RewardProvider.getMobRewards(resolvedId);
+    console.log(`[DropDbg] mob=${this.getTemplateId()} resolvedId=${resolvedId} rewards=${rewards.length} owner=${owner.getCharacterId()} pos=(${this.getX()},${this.getY()})`);
     const drops: Drop[] = [];
-    for (const reward of RewardProvider.getMobRewards(MobProvider.getResolvedTemplateId(this.getTemplateId()))) {
+    for (const reward of rewards) {
       const drop = this.createDrop(owner, reward);
       if (drop) drops.push(drop);
     }
+    console.log(`[DropDbg] created ${drops.length} drops`);
     if (drops.length > 0) {
       field.getDropPool().addDrops(drops, DropEnterType.CREATE, this.getX(), this.getY() - GameConstants.DROP_HEIGHT, delay, 0);
     }
@@ -285,7 +289,7 @@ distributeExp(): void {
 
   createDrop(owner: User, reward: Reward): Drop | null {
     const field = this.getField();
-    if (!field) return null;
+    if (!field) { console.log(`[DropDbg] createDrop: no field`); return null; }
     if (reward.isFieldRequirement() && reward.fieldId !== field.getFieldId()) {
       return null;
     }
@@ -298,6 +302,7 @@ distributeExp(): void {
       probability *= (this.mobStat.getOption(MobTemporaryStat.Showdown).nOption + 100) / 100;
     }
     if (!Util.succeedDouble(probability)) {
+      console.log(`[DropDbg] SKIP item=${reward.itemId} prob=${probability} (rolled false)`);
       return null;
     }
 
@@ -314,13 +319,15 @@ distributeExp(): void {
       if (owner.getSecondaryStat().hasOption(CharacterTemporaryStat.MesoUpByItem)) {
         money = Math.floor(money * (owner.getSecondaryStat().getOption(CharacterTemporaryStat.MesoUpByItem).nOption + 100) / 100);
       }
+      console.log(`[DropDbg] MESO amount=${money}`);
       return Drop.money(DropOwnType.USEROWN, this, money, owner.getCharacterId());
     }
 
     const itemInfo = ItemProvider.getItemInfo(reward.itemId);
-    if (!itemInfo) return null;
+    if (!itemInfo) { console.log(`[DropDbg] SKIP item=${reward.itemId} no itemInfo`); return null; }
     const quantity = Util.getRandom(reward.min, reward.max);
     const item = itemInfo.createItem(owner.getNextItemSn(), quantity, ItemVariationOption.NORMAL);
+    console.log(`[DropDbg] ITEM id=${reward.itemId} qty=${quantity}`);
     return Drop.item(DropOwnType.USEROWN, this, item, owner.getCharacterId(), reward.questId);
   }
 

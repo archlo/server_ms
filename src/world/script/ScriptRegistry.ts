@@ -16,4 +16,5 @@ export const ScriptRegistry = {
   npc: new NamedScriptRegistry(),
   portal: new NamedScriptRegistry(),
   item: new NamedScriptRegistry(),
+  fieldEnter: new NamedScriptRegistry(),
 };

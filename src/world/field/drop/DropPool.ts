@@ -26,7 +26,9 @@ export class DropPool extends FieldObjectPool<Drop> {
     }
     this.addObject(drop);
     if (enterType !== undefined) {
-      this.field.broadcastPacket(DropPacket.dropEnterField(drop, enterType, delay));
+      const pkt = DropPacket.dropEnterField(drop, enterType, delay);
+      console.log(`[DropDbg] BROADCAST dropId=${drop.getId()} isMoney=${drop.isMoney()} item=${drop.isMoney() ? drop.money : drop.item?.itemId} pos=(${drop.getX()},${drop.getY()}) src=(${drop.source?.getX()},${drop.source?.getY()}) enterType=${enterType}`);
+      this.field.broadcastPacket(pkt);
     }
   }
 

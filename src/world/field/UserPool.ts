@@ -15,6 +15,7 @@ import { TownPortalPacket } from './townportal/TownPortalPacket';
 import { DragonPacket } from '../user/DragonPacket';
 import { CashItemPacket } from '../item/CashItemPacket';
 import { MapleTvPacket } from './MapleTvPacket';
+import { ScriptManager } from '../script/ScriptManager';
 
 /**
  * Port of kinoko's UserPool. Holds the real User instances present in a field.
@@ -116,6 +117,15 @@ export class UserPool extends FieldObjectPool<User> {
       const last = mapleTvQueue[mapleTvQueue.length - 1];
       const totalWaitTime = Math.max(Math.floor((last.expireTime.getTime() - Date.now()) / 1000), 0);
       user.write(MapleTvPacket.updateMessage(mapleTvQueue[0], totalWaitTime));
+    }
+
+    // Execute field enter scripts (port of kinoko Field::addUser)
+    const mapInfo = this.field.getMapInfo();
+    if (mapInfo.hasOnFirstUserEnter() && this.field.consumeFirstEnterScript()) {
+      ScriptManager.startFieldEnterScript(user, this.field, mapInfo.onFirstUserEnter);
+    }
+    if (mapInfo.hasOnUserEnter()) {
+      ScriptManager.startFieldEnterScript(user, this.field, mapInfo.onUserEnter);
     }
   }
 

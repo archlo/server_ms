@@ -516,12 +516,13 @@ export class UserHandler {
     const field = user.getField();
     const portal = field?.getPortalByName(portalName);
     if (!field || !portal || portal.script === '') {
-      user.dispose();
+      // No script — fall through gracefully (don't disconnect).
       return;
     }
 
     if (!ScriptManager.startPortalScript(user, field, portal.script)) {
-      user.dispose();
+      // Script not registered — log and stay in place instead of disconnecting.
+      console.warn(`[Script] Portal script not found: ${portal.script} on field ${field.getFieldId()}`);
     }
   }
 

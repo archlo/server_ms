@@ -54,6 +54,9 @@ export class Field {
   private nextDropExpire:    Date = new Date(0);
   private nextReactorExpire: Date = new Date(0);
 
+  // Track whether onFirstUserEnter has been executed for this field
+  private _firstEnterScriptRun = false;
+
   // Maple TV message queue (port of kinoko Field mapleTvQueue)
   private readonly mapleTvQueue: MapleTvMessage[] = [];
 
@@ -87,6 +90,13 @@ export class Field {
   getMapInfo():   MapInfo { return this.mapInfo; }
   getReturnMap(): number  { return this.mapInfo.returnMap; }
   getFieldStorage(): any  { return this.fieldStorage; }
+
+  /** Returns true only once — the first time it's called (for onFirstUserEnter). */
+  consumeFirstEnterScript(): boolean {
+    if (this._firstEnterScriptRun) return false;
+    this._firstEnterScriptRun = true;
+    return true;
+  }
 
   // open gate storage (Thief gate skill)
   private readonly _openGates = new Map<number, { targetFieldId: number; targetPortalName: string }>();

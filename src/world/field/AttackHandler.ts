@@ -433,12 +433,15 @@ function handleAttack(user: User, attack: Attack): void {
 
     // Process on-kill
     if (mob.getHp() <= 0) {
+      console.log(`[DropDbg] KILL mob=${mob.getTemplateId()} hp=${mob.getHp()} controller=${mob.getController()?.getCharacterId()}`);
       handleRevive(user, mob);
       mob.getController()?.write(MobPacket.mobChangeController(mob, false));
       if (field?.getMobPool().removeMob(mob, MobLeaveType.ETC)) {
         mob.distributeExp();
         mob.spawnRevives(ai.delay);
         mob.dropRewards(user, ai.delay);
+      } else {
+        console.log(`[DropDbg] removeMob returned false — mob already removed`);
       }
     }
   }
