@@ -15,7 +15,7 @@ export enum ItemInfoType {
   incMMP='incMMP', incMMPr='incMMPr', incMaxHP='incMaxHP', incMaxMP='incMaxMP',
   incPAD='incPAD', incMAD='incMAD', incPDD='incPDD', incMDD='incMDD',
   incACC='incACC', incEVA='incEVA', incCraft='incCraft', incSpeed='incSpeed',
-  incJump='incJump', incSwim='incSwim', incFatigue='incFatigue', incIUC='incIUC',
+  incJump='incJump', incKnockback='incKnockback', incSwim='incSwim', incFatigue='incFatigue', incIUC='incIUC',
   incLEV='incLEV', incReqLevel='incReqLevel', incRandVol='incRandVol',
   incPERIOD='incPERIOD', success='success', cursed='cursed', recover='recover',
   randstat='randstat', preventslip='preventslip', warmsupport='warmsupport',

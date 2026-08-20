@@ -1031,6 +1031,7 @@ export class SkillProcessor {
     if (user.getHp() <= 0) return;
     SkillProcessor.handleRecovery(user, now);
     SkillProcessor.handleDragonBlood(user, now);
+    SkillProcessor.handlePoison(user, now);
     SkillProcessor.handleInfinity(user, now);
     SkillProcessor.handleAura(user, now);
     SkillProcessor.handleMissileTank(user, now);
@@ -1062,6 +1063,25 @@ export class SkillProcessor {
       }
       user.addHp(-hpConsume);
       user.setSchedule(skillId, new Date(now.getTime() + 1_000));
+    }
+  }
+
+  // OG: Mob poison DoT — nOption = damage-per-tick (from mob skill x stat),
+  // tOption = remaining duration in ms. Ticks once per second via schedule.
+  // The client shows the HP loss as a red damage number over the character.
+  private static handlePoison(user: User, now: Date): void {
+    if (!user.getSecondaryStat().hasOption(CharacterTemporaryStat.Poison)) return;
+    const option = user.getSecondaryStat().getOption(CharacterTemporaryStat.Poison);
+    const poisonSkillId = option.rOption;
+    const damagePerTick = option.nOption;
+    if (now > user.getSchedule(poisonSkillId)) {
+      if (user.getHp() <= damagePerTick) {
+        // Poison would kill — cancel the debuff instead (OG behavior)
+        user.resetTemporaryStat((cts) => cts === CharacterTemporaryStat.Poison);
+        return;
+      }
+      user.addHp(-damagePerTick);
+      user.setSchedule(poisonSkillId, new Date(now.getTime() + 1_000));
     }
   }
 

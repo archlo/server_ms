@@ -13,6 +13,8 @@ export class EquipData {
   incMaxHp = 0; incMaxMp = 0;
   incPad   = 0; incMad  = 0; incPdd  = 0; incMdd   = 0;
   incAcc   = 0; incEva  = 0; incCraft = 0; incSpeed = 0; incJump = 0;
+  incMhpPr = 0; incMmpPr = 0;  // percent stats
+  Knockback = 0;
 
   ruc  = 0; // remaining upgrade count
   cuc  = 0; // current upgrade count
@@ -104,6 +106,9 @@ export class EquipData {
     w.writeShort(this.incCraft);
     w.writeShort(this.incSpeed);
     w.writeShort(this.incJump);
+    w.writeShort(this.incMhpPr);
+    w.writeShort(this.incMmpPr);
+    w.writeShort(this.Knockback);
 
     w.writeMapleAsciiString(item.title);
 
@@ -154,6 +159,9 @@ export class EquipData {
         case ItemInfoType.incCraft: eq.incCraft = vary(); break;
         case ItemInfoType.incSpeed: eq.incSpeed = vary(); break;
         case ItemInfoType.incJump:  eq.incJump  = vary(); break;
+        case ItemInfoType.incMHPr: eq.incMhpPr = vary(); break;
+        case ItemInfoType.incMMPr: eq.incMmpPr = vary(); break;
+        case ItemInfoType.incKnockback: eq.Knockback = vary(); break;
         case ItemInfoType.tuc:      eq.ruc      = v;      break;
         case ItemInfoType.durability: eq.durability = v;  break;
       }
