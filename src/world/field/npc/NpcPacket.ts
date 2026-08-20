@@ -3,15 +3,21 @@ import { MapleSendOpcode } from '../../../protocol/opcodes/maple/send';
 import { Npc } from './Npc';
 import { MovePath } from '../life/MovePath';
 import { ScriptMessage } from '../../script/ScriptMessage';
+import { QuestProvider } from '../../../provider/QuestProvider';
 
 /** Port of kinoko's CNpcPool::OnPacket / OnNpcPacket. */
 export class NpcPacket {
-  static npcEnterField(npc: Npc): Buffer {
+  static npcEnterField(npc: Npc, questIds: number[] = []): Buffer {
     const w = new PacketWriter();
     w.writeShort(MapleSendOpcode.NPC_ENTER_FIELD.code);
     w.writeInt(npc.getId());
     w.writeInt(npc.getTemplateId());
     npc.encode(w);
+    // Quest list: count followed by quest IDs
+    w.writeShort(questIds.length);
+    for (const questId of questIds) {
+      w.writeInt(questId);
+    }
     return w.getPacket();
   }
 

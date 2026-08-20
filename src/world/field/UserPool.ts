@@ -10,6 +10,7 @@ import { DropEnterType } from './drop/DropEnterType';
 import { ReactorPacket } from './reactor/ReactorPacket';
 import { SummonedPacket } from './summoned/SummonedPacket';
 import { PetPacket } from '../user/PetPacket';
+import { QuestProvider } from '../../provider/QuestProvider';
 import { AffectedAreaPacket } from './affectedarea/AffectedAreaPacket';
 import { TownPortalPacket } from './townportal/TownPortalPacket';
 import { DragonPacket } from '../user/DragonPacket';
@@ -71,7 +72,8 @@ export class UserPool extends FieldObjectPool<User> {
       }
     }
     for (const npc of this.field.getNpcPool().getAll() as Npc[]) {
-      user.write(NpcPacket.npcEnterField(npc));
+      const questIds = QuestProvider.getQuestIdsByNpc(npc.getTemplateId());
+      user.write(NpcPacket.npcEnterField(npc, questIds));
       if (npc.getController() === null) {
         npc.setController(user);
         user.write(NpcPacket.npcChangeController(npc, true));

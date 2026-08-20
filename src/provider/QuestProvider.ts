@@ -12,6 +12,16 @@ export const QuestProvider = {
     return questInfos.get(questId);
   },
 
+  getQuestIdsByNpc(npcId: number): number[] {
+    const result: number[] = [];
+    for (const info of questInfos.values()) {
+      if (info.npc === npcId) {
+        result.push(info.questId);
+      }
+    }
+    return result;
+  },
+
   registerQuestInfo(info: QuestInfo): void {
     questInfos.set(info.questId, info);
   },
