@@ -520,7 +520,9 @@ export const CharacterDB = {
         money:               im.money,
         ext_slot_expire:     im.extSlotExpire ?? null,
         skill_cooltimes_json: '{}',
-        skill_records_json:  '[]',
+        skill_records_json:  JSON.stringify(cd.skillManager.getSkillRecords().map(r => ({
+          skillId: r.skillId, skillLevel: r.skillLevel, masterLevel: r.masterLevel,
+        }))),
         quest_records_json:  '[]',
         item_sn_counter:     0,
         friend_max:          cd.friendMax,
