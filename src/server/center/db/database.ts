@@ -192,6 +192,22 @@ export class Database {
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
             `);
 
+            // --- mob_drops table (mob drop tables) ---
+            await tempKnex.raw(`
+                CREATE TABLE IF NOT EXISTS \`mob_drops\` (
+                  \`id\` int(11) NOT NULL AUTO_INCREMENT,
+                  \`mob_id\` int(11) NOT NULL,
+                  \`item_id\` int(11) NOT NULL,
+                  \`min_quantity\` int(11) NOT NULL DEFAULT 1,
+                  \`max_quantity\` int(11) NOT NULL DEFAULT 1,
+                  \`probability\` decimal(10,6) NOT NULL,
+                  \`quest_id\` int(11) NOT NULL DEFAULT 0,
+                  \`field_id\` int(11) NOT NULL DEFAULT 0,
+                  PRIMARY KEY (\`id\`),
+                  KEY \`idx_mob_id\` (\`mob_id\`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+            `);
+
             // --- memo_ids counter table (kinoko IdAccessor::nextMemoId) ---
             await tempKnex.raw(`
                 CREATE TABLE IF NOT EXISTS \`memo_ids\` (
