@@ -420,10 +420,10 @@ function handleAttack(user: User, attack: Attack): void {
     if (actualDamage > 0) {
       mob.addDamage(user.getCharacterId(), actualDamage);
       mob.setHp(mob.getHp() - actualDamage);
-      // TEMP DEBUG: 1-hit kill investigation
-      console.log(`[MeleeDbg] tmpl=${mob.getTemplateId()} maxHp=${mob.getMaxHp()} hpBefore=${mob.getHp() + actualDamage} dmgSent=${totalDamage} hpAfter=${mob.getHp()}`);
-      field?.broadcastPacket(MobPacket.mobDamaged(mob, totalDamage));
     }
+    // Always broadcast mobDamaged so the client can render misses (damage=0).
+    // OG CMob::ShowDamage: nDamage==0 → Effect_Miss.
+    field?.broadcastPacket(MobPacket.mobDamaged(mob, totalDamage));
 
     // Apply MP damage
     if (mpDamage > 0) {
