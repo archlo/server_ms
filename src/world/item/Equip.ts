@@ -33,6 +33,9 @@ export class Equip extends Item {
   iCraft = 0;
   iSpeed = 0;
   iJump = 0;
+  iMhpPr = 0;
+  iMmpPr = 0;
+  iKnockback = 0;
   attribute = 0;
   levelUpType = 0;
   level = 0;
@@ -114,6 +117,9 @@ export class Equip extends Item {
     eq.iCraft = this.iCraft;
     eq.iSpeed = this.iSpeed;
     eq.iJump = this.iJump;
+    eq.iMhpPr = this.iMhpPr;
+    eq.iMmpPr = this.iMmpPr;
+    eq.iKnockback = this.iKnockback;
     eq.attribute = this.attribute;
     eq.levelUpType = this.levelUpType;
     eq.level = this.level;
@@ -328,6 +334,14 @@ export class Equip extends Item {
     packet.writeShort(this.iCraft);
     packet.writeShort(this.iSpeed);
     packet.writeShort(this.iJump);
+
+    // OG: v95 GW_ItemSlotEquip::RawEncode writes these three percent/knockback
+    // shorts right after the jump stat — the client ItemDecoder reads them, so
+    // omitting them desyncs every equipped item by 6 bytes (only the first
+    // worn piece survived). See ItemDecoder._decodeEquip.
+    packet.writeShort(this.iMhpPr);
+    packet.writeShort(this.iMmpPr);
+    packet.writeShort(this.iKnockback);
 
     packet.writeMapleAsciiString(this.title);
     packet.writeShort(this.attribute);

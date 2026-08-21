@@ -184,6 +184,7 @@ function serializeItem(item: Item): object {
       iMaxHp: eq.iMaxHp, iMaxMp: eq.iMaxMp,
       iPad: eq.iPad, iMad: eq.iMad, iPDD: eq.iPDD, iMDD: eq.iMDD,
       iAcc: eq.iAcc, iEva: eq.iEva, iCraft: eq.iCraft, iSpeed: eq.iSpeed, iJump: eq.iJump,
+      iMhpPr: eq.iMhpPr, iMmpPr: eq.iMmpPr, iKnockback: eq.iKnockback,
       attribute: eq.attribute, levelUpType: eq.levelUpType, level: eq.level,
       exp: eq.exp, durability: eq.durability,
       itemState: eq.itemState, options: eq.options, bonusOptions: eq.bonusOptions,
@@ -239,6 +240,7 @@ function deserializeItem(o: any): Item {
       eq.iPad = e.iPad ?? 0; eq.iMad = e.iMad ?? 0; eq.iPDD = e.iPDD ?? 0; eq.iMDD = e.iMDD ?? 0;
       eq.iAcc = e.iAcc ?? 0; eq.iEva = e.iEva ?? 0; eq.iCraft = e.iCraft ?? 0;
       eq.iSpeed = e.iSpeed ?? 0; eq.iJump = e.iJump ?? 0;
+      eq.iMhpPr = e.iMhpPr ?? 0; eq.iMmpPr = e.iMmpPr ?? 0; eq.iKnockback = e.iKnockback ?? 0;
       eq.attribute = e.attribute ?? eq.attribute;
       eq.levelUpType = e.levelUpType ?? 0; eq.level = e.level ?? 0;
       eq.exp = e.exp ?? 0; eq.durability = e.durability ?? 0;
@@ -273,6 +275,7 @@ function deserializeItem(o: any): Item {
       eq.iPad = ed.incPad; eq.iMad = ed.incMad; eq.iPDD = ed.incPdd; eq.iMDD = ed.incMdd;
       eq.iAcc = ed.incAcc; eq.iEva = ed.incEva; eq.iCraft = ed.incCraft;
       eq.iSpeed = ed.incSpeed; eq.iJump = ed.incJump;
+      eq.iMhpPr = ed.incMhpPr; eq.iMmpPr = ed.incMmpPr; eq.iKnockback = ed.Knockback;
       eq.levelUpType = ed.levelUpType; eq.level = ed.level;
       eq.exp = ed.exp; eq.durability = ed.durability;
     }
