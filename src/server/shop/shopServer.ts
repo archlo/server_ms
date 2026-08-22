@@ -284,6 +284,23 @@ export class ShopServer extends WorkerServer {
 
             this.sendBuyResult(session, entry, 0);
             this.sendUpdatedCash(session, entry);
+        } else if (action === 4) {
+            // CCashShop::SendGiftsPacket @0x487B60 — bulk gift, one recipient
+            // per packet: str SPW, int sn, byte buyOneADay, str name, str msg.
+            packet.readMapleAsciiString(); // SPW (unused)
+            const sn = packet.readInt();
+            packet.readByte(); // requestBuyOneADay
+            const recipientName = packet.readMapleAsciiString();
+            const giftMessage = packet.readMapleAsciiString();
+            await this.giftCommodity(session, entry, account, sn, recipientName, giftMessage, 1);
+        } else if (action === 33) {
+            // CCashShop::OnGiftPackage @0x4907B0 — package gift:
+            // str SPW, int sn, str name, str msg. Packages are itemId/10000==910.
+            packet.readMapleAsciiString(); // SPW (unused)
+            const sn = packet.readInt();
+            const recipientName = packet.readMapleAsciiString();
+            const giftMessage = packet.readMapleAsciiString();
+            await this.giftCommodity(session, entry, account, sn, recipientName, giftMessage, 1);
         } else if (action === 44) {
             // CCashShop::RequestCashPurchaseRecord @0x4823C0 (sub-action 0x2C):
             // purchase record for a limit(2|3) commodity SN. Response format
@@ -300,6 +317,48 @@ export class ShopServer extends WorkerServer {
             w.writeByte(purchased ? 1 : 0);
             entry.enc.write(w.getPacket());
         }
+    }
+
+    private async giftCommodity(
+        session: Session,
+        entry: { enc: EncryptedSession; accountId: number; account: any },
+        account: any,
+        sn: number,
+        recipientName: string,
+        giftMessage: string,
+        quantity: number,
+    ): Promise<void> {
+        const item = CashShopProvider.getItem(sn);
+        if (!item) {
+            this.sendBuyResult(session, entry, 3);
+            return;
+        }
+
+        const totalCost = item.discountPrice > 0 ? item.discountPrice : item.price;
+        if ((account.nxCredit ?? 0) < totalCost * quantity) {
+            this.sendBuyResult(session, entry, 2);
+            return;
+        }
+
+        const recipientCharId = await AccountDB.findCharacterIdByName(recipientName);
+        if (!recipientCharId) {
+            this.sendBuyResult(session, entry, 4); // Character not found
+            return;
+        }
+
+        account.nxCredit -= totalCost * quantity;
+
+        await AccountDB.updateAccountCash(
+            account.id,
+            account.nxCredit,
+            account.maplePoint ?? 0,
+            account.nxPrepaid ?? 0,
+        );
+
+        await AccountDB.addCashItem(account.id, recipientCharId, item);
+
+        this.sendBuyResult(session, entry, 0);
+        this.sendUpdatedCash(session, entry);
     }
 
     private sendBuyResult(
