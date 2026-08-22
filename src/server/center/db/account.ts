@@ -100,6 +100,21 @@ export class AccountDB {
         }
     }
 
+    /** CCashShop purchase record lookup (GetCashPurchaseRecord @0x482450):
+     *  true when the account has ever bought the cash item with this SN. */
+    static async hasCashItemRecord(accountId: number, sn: number): Promise<boolean> {
+        try {
+            const rows = await Database.knex('cash_items')
+                .where({ account_id: accountId, sn })
+                .select('id')
+                .limit(1);
+            return rows.length > 0;
+        } catch (err) {
+            CenterServer.instance.logger.error(`AccountDB.hasCashItemRecord(${accountId}, ${sn}): ${err.message}`);
+            return false;
+        }
+    }
+
     static async findCharacterIdByName(name: string): Promise<number | null> {
         try {
             const rows = await Database.knex('characters')

@@ -284,6 +284,21 @@ export class ShopServer extends WorkerServer {
 
             this.sendBuyResult(session, entry, 0);
             this.sendUpdatedCash(session, entry);
+        } else if (action === 44) {
+            // CCashShop::RequestCashPurchaseRecord @0x4823C0 (sub-action 0x2C):
+            // purchase record for a limit(2|3) commodity SN. Response format
+            // per OnCashItemResPurchaseRecord @0x495B50: int sn, byte purchased.
+            const key = packet.readInt();
+            let purchased = false;
+            if (key !== 0 && account.id) {
+                purchased = await AccountDB.hasCashItemRecord(account.id, key);
+            }
+            const w = new PacketWriter(8);
+            w.writeShort(MapleSendOpcode.CASH_SHOP_CASH_ITEM_RESULT.getValue());
+            w.writeByte(0xAF);
+            w.writeInt(key);
+            w.writeByte(purchased ? 1 : 0);
+            entry.enc.write(w.getPacket());
         }
     }
 
